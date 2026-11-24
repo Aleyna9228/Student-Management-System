@@ -1,0 +1,78 @@
+class Person:
+    def __init__(self, name: str, email: str):
+        self.name = name
+        self.email = email
+
+    def get_info(self) -> str:
+        return f"Name: {self.name}, Email: {self.email}"
+
+
+class Course:
+    def __init__(self, course_code: str, course_name: str, credits: int):
+        self.course_code = course_code
+        self.course_name = course_name
+        self.credits = credits
+
+    def __str__(self) -> str:
+        return f"{self.course_code} - {self.course_name} ({self.credits} Credits)"
+
+
+class Student(Person):
+    def __init__(self, name: str, email: str, student_id: str, department: str):
+        super().__init__(name, email)
+        self.student_id = student_id
+        self.department = department
+        self.courses = {}  # {Course: grade}
+
+    def enroll_course(self, course: Course) -> None:
+        if course not in self.courses:
+            self.courses[course] = None
+            print(f"{self.name} enrolled in {course.course_code}.")
+        else:
+            print(f"{self.name} is already enrolled in {course.course_code}.")
+
+    def assign_grade(self, course: Course, grade: float) -> None:
+        if course in self.courses:
+            self.courses[course] = grade
+        else:
+            print(f"Error: {self.name} is not enrolled in {course.course_code}.")
+
+    def calculate_gpa(self) -> float:
+        total_points = 0.0
+        total_credits = 0
+        for course, grade in self.courses.items():
+            if grade is not None:
+                total_points += grade * course.credits
+                total_credits += course.credits
+        return round(total_points / total_credits, 2) if total_credits > 0 else 0.0
+
+    def get_info(self) -> str:
+        base_info = super().get_info()
+        return (
+            f"[{self.student_id}] {base_info} | "
+            f"Department: {self.department} | GPA: {self.calculate_gpa()}"
+        )
+
+
+# --- Örnek Kullanım (Test) ---
+if __name__ == "__main__":
+    # Derslerin oluşturulması
+    c1 = Course("SV304", "Human Computer Interaction", 4)
+    c2 = Course("AII201", "Artificial Intelligence", 3)
+
+    # Öğrenci nesnesinin oluşturulması
+    student1 = Student(
+        name="Kerem Aykac",
+        email="kerem@example.com",
+        student_id="20231425",
+        department="Software Engineering"
+    )
+
+    # Ders kaydı ve not girişi
+    student1.enroll_course(c1)
+    student1.enroll_course(c2)
+    student1.assign_grade(c1, 3.5)
+    student1.assign_grade(c2, 4.0)
+
+    # Çıktı
+    print(student1.get_info())
